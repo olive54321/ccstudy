@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>English Speaking Practice for You 💕</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      background: #fafafa;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .sub {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    label {
+      font-size: 14px;
+      margin-right: 8px;
+    }
+    select {
+      padding: 4px 8px;
+    }
+    button {
+      margin: 5px;
+      padding: 8px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: white;
+    }
+    button:hover {
+      background: #f0f0f0;
+    }
+    #target, #result, #score, #hint {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 0 3px rgba(0,0,0,0.05);
+    }
+    #target strong {
+      font-size: 18px;
+    }
+    #log {
+      margin-top: 10px;
+      color: #666;
+      font-size: 13px;
+    }
+    .tag {
+      display: inline-block;
+      background: #eee;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>English Speaking Practice 💬</h1>
+  <div class="sub">for my favorite girl 💖</div>
+
+  <!-- 场景选择：日常 / 旅游 / 甜甜恋爱 -->
+  <div>
+    <label for="scene">Choose a topic:</label>
+    <select id="scene">
+      <option value="daily">Daily life</option>
+      <option value="travel">Travel</option>
+      <option value="sweet">Sweet</option>
+    </select>
+    <span class="tag">先选一个主题，再点 Next</span>
+  </div>
+
+  <!-- 显示当前要练的句子 + 中文翻译 -->
+  <div id="target">
+    Click “Next sentence” to start.
+  </div>
+
+  <!-- 按钮区 -->
+  <div style="margin-top: 15px;">
+    <button id="btnNext">Next sentence</button>
+    <button id="btnSpeak">Computer read</button>
+    <button id="btnRecord">I will speak</button>
+  </div>
+
+  <!-- 识别结果 -->
+  <div id="result">Recognized text will appear here.</div>
+  <!-- 分数 + 鼓励 -->
+  <div id="score">Score will appear here.</div>
+  <!-- 小提示 -->
+  <div id="hint">Tip: Use Google Chrome, and allow microphone when the browser asks.</div>
+  <!-- 日志状态 -->
+  <div id="log"></div>
+
+  <script>
+    // ===== 1. 句子库：可以改成你们自己的句子 =====
+    // 每个句子：english 英文, chinese 中文翻译
+    const data = {
+      daily: [
+        { english: "How are you today?", chinese: "你今天怎么样？" },
+        { english: "I just finished my work.", chinese: "我刚刚下班/完成工作。" },
+        { english: "I am learning English every day.", chinese: "我每天都在学英语。" },
+        { english: "This is not perfect, but I am getting better.", chinese: "虽然不完美，但我在慢慢进步。" }
+      ],
+      travel: [
+        { english: "Where is the nearest subway station?", chinese: "最近的地铁站在哪里？" },
+        { english: "Could you recommend a good restaurant nearby?", chinese: "你可以推荐附近好吃的餐厅吗？" },
+        { english: "How much is a ticket to the airport?", chinese: "去机场的车票多少钱？" },
+        { english: "I would like to book a table for two.", chinese: "我想订一张两个人的餐桌。" }
+      ],
+      sweet: [
+        { english: "I am proud of you.", chinese: "我真的为你感到骄傲。" },
+        { english: "I miss you every single day.", chinese: "我每天都在想你。" },
+        { english: "You make my life so much better.", chinese: "因为你，我的生活变得好多了。" },
+        { english: "No matter what happens, I am always on your side.", chinese: "不管发生什么，我都站在你这边。" }
+      ]
+    };
+
+    // 当前场景的句子列表
+    let currentList = data.daily;
+    // 当前这一次要练的句子
+    let currentSentence = null;
+
+    // ===== 2. 获取页面上的元素 =====
+    const sceneSelect = document.getElementById("scene");
+    const targetDiv = document.getElementById("target");
+    const resultDiv = document.getElementById("result");
+    const scoreDiv = document.getElementById("score");
+    const hintDiv = document.getElementById("hint");
+    const logDiv = document.getElementById("log");
+
+    // ===== 3. 场景改变时，切换句子列表 =====
+    sceneSelect.onchange = function () {
+      const value = sceneSelect.value;
+      if (value === "daily") currentList = data.daily;
+      else if (value === "travel") currentList = data.travel;
+      else if (value === "sweet") currentList = data.sweet;
+
+      // 切换场景后，清空当前显示
+      currentSentence = null;
+      targetDiv.innerHTML = "Click “Next sentence” to start.";
+      resultDiv.textContent = "Recognized text will appear here.";
+      scoreDiv.textContent = "Score will appear here.";
+      logDiv.textContent = "";
+    };
+
+    // ===== 4. 简单相似度计算：按单词重合数量算百分比 =====
+    function calcSimilarity(a, b) {
+      if (!a || !b) return 0;
+
+      // 全部转小写，去掉标点，只保留字母和空格，再按空格拆成单词
+      const wa = a.toLowerCase().replace(/[^a-z\s]/g, "").split(/\s+/).filter(Boolean);
+      const wb = b.toLowerCase().replace(/[^a-z\s]/g, "").split(/\s+/).filter(Boolean);
+
+      if (wa.length === 0 || wb.length === 0) return 0;
+
+      let match = 0;
+      wa.forEach(word => {
+        if (wb.includes(word)) match++;
+      });
+
+      return Math.round((match / Math.max(wa.length, wb.length)) * 100);
+    }
+
+    // ===== 5. “Next sentence” 按钮：随机挑一句当前场景的句子 =====
+    document.getElementById("btnNext").onclick = function () {
+      const idx = Math.floor(Math.random() * currentList.length);
+      currentSentence = currentList[idx];
+
+      targetDiv.innerHTML =
+        "<div>English:</div>" +
+        "<strong>" + currentSentence.english + "</strong>" +
+        "<div style='margin-top:8px;color:#555;'>中文： " + currentSentence.chinese + "</div>";
+
+      resultDiv.textContent = "Recognized text will appear here.";
+      scoreDiv.textContent = "Score will appear here.";
+      logDiv.textContent = "";
+    };
+
+    // ===== 6. “Computer read” 按钮：用浏览器 TTS 读一句 =====
+    document.getElementById("btnSpeak").onclick = function () {
+      if (!currentSentence) {
+        logDiv.textContent = "Please click 'Next sentence' first.";
+        return;
+      }
+      const utter = new SpeechSynthesisUtterance(currentSentence.english);
+      utter.lang = "en-US"; // 可以固定为美音
+      window.speechSynthesis.speak(utter);
+    };
+
+    // ===== 7. “I will speak” 按钮：开始录音 + 语音识别 =====
+    document.getElementById("btnRecord").onclick = function () {
+      // 检查浏览器是否支持语音识别
+      if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
+        logDiv.textContent = "Speech recognition not supported. Please use Google Chrome.";
+        return;
+      }
+
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SR();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      logDiv.textContent = "Listening... Please speak.";
+      hintDiv.textContent = "If nothing happens, check if you allowed microphone access.";
+
+      // 识别成功
+      recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript;
+        resultDiv.textContent = "You said: " + text;
+
+        if (currentSentence) {
+          const score = calcSimilarity(text, currentSentence.english);
+          scoreDiv.textContent = "Similarity: " + score + "%";
+
+          if (score > 85) {
+            scoreDiv.textContent += "  🌟 Amazing!";
+          } else if (score > 60) {
+            scoreDiv.textContent += "  🙂 Pretty good, try again!";
+          } else {
+            scoreDiv.textContent += "  💪 Keep going, you are learning!";
+          }
+        }
+        logDiv.textContent = "Done.";
+      };
+
+      // 出错情况
+      recognition.onerror = (event) => {
+        logDiv.textContent = "Error: " + event.error;
+      };
+
+      // 结束（无论成功失败）
+      recognition.onend = () => {
+        if (!logDiv.textContent.startsWith("Error") && logDiv.textContent !== "Done.") {
+          logDiv.textContent = "Stopped. You can click 'I will speak' again.";
+        }
+      };
+
+      recognition.start();
+    };
+  </script>
+</body>
+</html>
