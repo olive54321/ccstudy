@@ -1,356 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Speaking Practice</title>
-  <style>
-    body{
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-      max-width:860px;margin:28px auto;padding:18px;
-      background:#fafafa;color:#111;
-    }
-    .card{
-      background:#fff;border:1px solid #eee;border-radius:14px;
-      padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.04);
-      margin-bottom:14px;
-    }
-    h1{margin:0 0 6px 0;text-align:center;}
-    .sub{margin:0 0 14px 0;text-align:center;color:#666;font-size:14px;}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-    select,button,input{
-      border:1px solid #ccc;border-radius:10px;
-      padding:9px 12px;font-size:14px;background:#fff;
-    }
-    button{cursor:pointer}
-    button:hover{background:#f3f3f3}
-    .muted{color:#666;font-size:13px}
-    #english{font-size:20px;font-weight:700;line-height:1.35}
-    #chinese{margin-top:8px;color:#444}
-    .pill{
-      display:inline-block;background:#f1f1f1;border-radius:999px;
-      padding:4px 10px;font-size:12px;color:#444;
-    }
-    .progressWrap{width:100%;height:10px;background:#eee;border-radius:999px;overflow:hidden}
-    .progressBar{height:10px;background:#111;width:0%}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media (max-width:720px){ .grid2{grid-template-columns:1fr} }
-    .list{
-      max-height:220px;overflow:auto;border:1px solid #eee;border-radius:12px;
-      padding:8px;background:#fff;
-    }
-    .item{
-      padding:8px;border-radius:10px;border:1px solid #eee;margin:6px 0;
-      display:flex;gap:10px;align-items:flex-start;justify-content:space-between;
-    }
-    .item button{padding:6px 10px;border-radius:10px}
-    .tiny{font-size:12px;color:#666}
-    .ok{color:#0a7}
-    .warn{color:#b60}
-    .bad{color:#c33}
-    code{background:#f4f4f4;padding:2px 6px;border-radius:6px}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>English Speaking Practice</title>
+<style>
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  max-width:900px;margin:30px auto;padding:20px;background:#fafafa;color:#111;
+}
+.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;
+box-shadow:0 2px 10px rgba(0,0,0,.05)}
+h1{text-align:center;margin-bottom:6px}
+.sub{text-align:center;color:#666;margin-bottom:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button,select,input{
+  padding:8px 12px;border-radius:10px;border:1px solid #ccc;background:#fff;cursor:pointer
+}
+button:hover{background:#f3f3f3}
+#english{font-size:20px;font-weight:700;line-height:1.4}
+#chinese{margin-top:6px;color:#444}
+.progress{height:10px;background:#eee;border-radius:999px;overflow:hidden}
+.bar{height:10px;background:#111;width:0%}
+.list{max-height:200px;overflow:auto;border:1px solid #eee;border-radius:10px;padding:8px}
+.item{border:1px solid #eee;border-radius:8px;padding:8px;margin:6px 0;
+display:flex;justify-content:space-between;gap:10px}
+.small{font-size:12px;color:#666}
+.good{color:#0a7}
+.warn{color:#b60}
+.bad{color:#c33}
+</style>
 </head>
 <body>
-  <h1>English Speaking Practice</h1>
-  <div class="sub">700 sentences · Prev/Next/Random · Favorites · Wrong-book · Progress saved</div>
 
-  <div class="card">
-    <div class="row" style="justify-content:space-between;">
-      <div class="row">
-        <span class="pill">Topic</span>
-        <select id="scene">
-          <option value="daily">Daily</option>
-          <option value="travel">Travel</option>
-          <option value="sweet">Sweet 💕</option>
-          <option value="shopping">购物 Shopping</option>
-          <option value="housing">住 Housing</option>
-          <option value="dining">吃饭 Dining</option>
-          <option value="study">学习 Study</option>
-        </select>
+<h1>English Speaking Practice</h1>
+<div class="sub">700 TOEFL-level sentences · Progress saved</div>
 
-        <span class="pill">Mode</span>
-        <select id="mode">
-          <option value="all">All sentences</option>
-          <option value="wrong">Wrong-book only</option>
-          <option value="fav">Favorites only</option>
-        </select>
+<div class="card">
+  <div class="row">
+    <select id="scene">
+      <option value="daily">Daily</option>
+      <option value="travel">Travel</option>
+      <option value="sweet">Sweet</option>
+      <option value="shopping">Shopping</option>
+      <option value="housing">Housing</option>
+      <option value="dining">Dining</option>
+      <option value="study">Study</option>
+    </select>
 
-        <span class="pill">Low-score → Wrong-book</span>
-        <input id="threshold" type="number" min="0" max="100" step="1" value="70" style="width:90px" />
-      </div>
+    <select id="mode">
+      <option value="all">All</option>
+      <option value="fav">Favorites</option>
+      <option value="wrong">Wrong-book</option>
+    </select>
 
-      <div class="row">
-        <button id="btnReset">Reset progress</button>
-      </div>
-    </div>
-
-    <div style="margin-top:12px" class="progressWrap" aria-label="progress">
-      <div id="progressBar" class="progressBar"></div>
-    </div>
-    <div style="margin-top:8px" class="row">
-      <div id="progressText" class="muted">Loading…</div>
-      <div id="statusPill" class="pill">Ready</div>
-    </div>
+    <span class="small">Wrong if &lt;</span>
+    <input id="threshold" type="number" value="70" style="width:60px"/>
   </div>
 
-  <div class="card">
-    <div id="english">Loading sentences…</div>
-    <div id="chinese"></div>
+  <div style="margin-top:10px" class="progress">
+    <div id="bar" class="bar"></div>
+  </div>
+  <div id="progressText" class="small"></div>
+</div>
 
-    <div class="row" style="margin-top:12px;">
-      <button id="btnPrev">◀ Previous</button>
-      <button id="btnNext">Next ▶</button>
-      <button id="btnRandom">🎲 Random</button>
-      <button id="btnSpeak">🔊 Computer read</button>
-      <button id="btnRecord">🎤 I will speak</button>
-      <button id="btnFav">⭐ Favorite</button>
-      <button id="btnWrong">📝 Toggle Wrong</button>
-    </div>
+<div class="card">
+  <div id="english">Loading…</div>
+  <div id="chinese"></div>
 
-    <div style="margin-top:10px" class="muted">
-      Tip: Use <b>Chrome</b>. If microphone doesn’t work, check browser permission.
-    </div>
+  <div class="row" style="margin-top:12px">
+    <button id="prev">◀ Prev</button>
+    <button id="next">Next ▶</button>
+    <button id="rand">🎲 Random</button>
+    <button id="speak">🔊 Read</button>
+    <button id="record">🎤 Speak</button>
+    <button id="fav">⭐</button>
+    <button id="wrong">📝</button>
   </div>
 
-  <div class="grid2">
-    <div class="card">
-      <div class="pill">Recognized</div>
-      <div id="result" style="margin-top:10px;">Recognized text will appear here.</div>
-      <div style="margin-top:10px" class="pill">Score</div>
-      <div id="score" style="margin-top:10px;">Score will appear here.</div>
-      <div id="log" class="muted" style="margin-top:10px;"></div>
-    </div>
+  <div id="result" class="small"></div>
+  <div id="score"></div>
+</div>
 
-    <div class="card">
-      <div class="row" style="justify-content:space-between;">
-        <div class="pill">Lists</div>
-        <div class="tiny">Click an item to jump</div>
-      </div>
-
-      <div class="row" style="margin-top:10px;">
-        <button id="tabFav">⭐ Favorites</button>
-        <button id="tabWrong">📝 Wrong-book</button>
-      </div>
-
-      <div id="listTitle" class="muted" style="margin-top:10px;">Favorites</div>
-      <div id="listBox" class="list"></div>
-    </div>
+<div class="card">
+  <div class="row">
+    <button id="tabFav">⭐ Favorites</button>
+    <button id="tabWrong">📝 Wrong-book</button>
   </div>
+  <div id="list" class="list"></div>
+</div>
 
 <script>
-/* ======================
-   Storage keys (per topic)
-====================== */
-function k(topic, name){ return `spk_${topic}_${name}`; }
+const $ = id => document.getElementById(id);
+let topic="daily",mode="all",threshold=70;
+let full=[],active=[],idx=0;
+let fav=new Set(),wrong=new Set();
 
-/* ======================
-   State
-====================== */
-let topic = "daily";
-let mode = "all";              // all / wrong / fav
-let threshold = 70;
-
-let fullList = [];             // loaded from data/topic.json
-let activeList = [];           // filtered by mode
-let index = -1;                // current index in activeList
-
-let favorites = new Set();     // store ids
-let wrongs = new Set();        // store ids
-let lastScores = new Map();    // id -> last score
-
-/* ======================
-   Helpers
-====================== */
-const $ = (id)=>document.getElementById(id);
-
-function sentenceId(s){
-  // stable-ish id: use first 80 chars of en
-  return (s.en || "").trim().toLowerCase().slice(0,80);
+function sid(s){return s.en.slice(0,80).toLowerCase()}
+function save(){
+  localStorage.setItem(topic+"_i",idx);
+  localStorage.setItem(topic+"_f",[...fav]);
+  localStorage.setItem(topic+"_w",[...wrong]);
 }
-
-function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
-
-function setStatus(text){
-  $("statusPill").textContent = text;
+function load(){
+  idx=parseInt(localStorage.getItem(topic+"_i")||0);
+  fav=new Set((localStorage.getItem(topic+"_f")||"").split(",").filter(x=>x));
+  wrong=new Set((localStorage.getItem(topic+"_w")||"").split(",").filter(x=>x));
 }
-
-function saveState(){
-  localStorage.setItem(k(topic,"index"), String(index));
-  localStorage.setItem(k(topic,"favorites"), JSON.stringify([...favorites]));
-  localStorage.setItem(k(topic,"wrongs"), JSON.stringify([...wrongs]));
-  localStorage.setItem(k(topic,"threshold"), String(threshold));
-  localStorage.setItem(k(topic,"mode"), mode);
+function rebuild(){
+  if(mode==="fav") active=full.filter(s=>fav.has(sid(s)));
+  else if(mode==="wrong") active=full.filter(s=>wrong.has(sid(s)));
+  else active=full;
+  if(idx>=active.length) idx=0;
 }
-
-function loadState(){
-  try{
-    const idx = parseInt(localStorage.getItem(k(topic,"index")) ?? "-1", 10);
-    index = Number.isFinite(idx) ? idx : -1;
-
-    favorites = new Set(JSON.parse(localStorage.getItem(k(topic,"favorites")) ?? "[]"));
-    wrongs = new Set(JSON.parse(localStorage.getItem(k(topic,"wrongs")) ?? "[]"));
-
-    threshold = parseInt(localStorage.getItem(k(topic,"threshold")) ?? "70", 10);
-    threshold = clamp(threshold, 0, 100);
-    $("threshold").value = threshold;
-
-    mode = localStorage.getItem(k(topic,"mode")) ?? "all";
-    $("mode").value = mode;
-  }catch{
-    index = -1; favorites = new Set(); wrongs = new Set(); threshold = 70; mode = "all";
-  }
+function show(){
+  if(!active.length){$("english").textContent="No sentences";return}
+  const s=active[idx];
+  $("english").textContent=s.en;
+  $("chinese").textContent=s.zh||"";
+  $("progressText").textContent=`${idx+1}/${active.length}`;
+  $("bar").style.width=((idx+1)/active.length*100)+"%";
+  save(); renderList();
 }
-
-function cleanWords(s){
-  return (s || "").toLowerCase().replace(/[^a-z\s]/g,"").split(/\s+/).filter(Boolean);
-}
-
-/* ======================
-   Strict-ish text matching score
-   (still not phoneme-level; but much stricter than word-set)
-====================== */
-function calcSimilarity(spoken, target){
-  if(!spoken || !target) return 0;
-  const sWords = cleanWords(spoken);
-  const tWords = cleanWords(target);
-  if(!sWords.length || !tWords.length) return 0;
-
-  let score = 0;
-  const maxScore = tWords.length * 2;
-
-  // order-sensitive matching
-  let ti = 0;
-  for(const w of sWords){
-    if(ti < tWords.length && w === tWords[ti]){ score += 2; ti++; }
-    else if(tWords.includes(w)) score += 1;
-  }
-
-  // length penalty (speaking too short)
-  const ratio = sWords.length / tWords.length;
-  if(ratio < 0.75) score *= ratio;
-
-  return Math.round(Math.min(100, (score / maxScore) * 100));
-}
-
-/* ======================
-   Load sentences from JSON
-====================== */
 async function loadTopic(t){
-  topic = t;
-  setStatus("Loading…");
-  $("english").textContent = "Loading sentences…";
-  $("chinese").textContent = "";
-  $("result").textContent = "Recognized text will appear here.";
-  $("score").textContent = "Score will appear here.";
-  $("log").textContent = "";
-
-  const resp = await fetch(`./data/${topic}.json`, { cache: "no-cache" });
-  if(!resp.ok) throw new Error(`Failed to load data/${topic}.json`);
-  fullList = await resp.json();
-
-  // normalize entries
-  fullList = fullList.map(s => ({ en: (s.en||"").trim(), zh: (s.zh||"").trim() }));
-
-  loadState();
-  rebuildActiveList();
-  // if saved index is out of range, reset
-  if(index < -1 || index >= activeList.length) index = -1;
-
-  // show a sentence (resume if possible)
-  if(activeList.length){
-    if(index === -1) index = 0;
-    showCurrent();
-  }else{
-    $("english").textContent = "No sentences in this mode yet.";
-    $("chinese").textContent = "Try switching Mode back to All sentences.";
-    updateProgress();
+  topic=t;
+  $("english").textContent="Loading…";
+  const resp=await fetch(`./data/${topic}.json`,{cache:"no-cache"});
+  if(!resp.ok){
+    const msg=`Fetch failed ${resp.status} ${resp.statusText}`;
+    $("english").textContent=msg; throw new Error(msg);
   }
-
-  renderList();
-  setStatus("Ready");
+  full=await resp.json(); load(); rebuild(); show();
 }
 
-function rebuildActiveList(){
-  if(mode === "all"){
-    activeList = fullList;
-  }else if(mode === "fav"){
-    activeList = fullList.filter(s => favorites.has(sentenceId(s)));
-  }else if(mode === "wrong"){
-    activeList = fullList.filter(s => wrongs.has(sentenceId(s)));
-  }else{
-    activeList = fullList;
-  }
-}
-
-function updateProgress(){
-  const total = activeList.length || 0;
-  const pos = total ? (index + 1) : 0;
-  $("progressText").textContent = `Topic: ${topic} · Mode: ${mode} · ${pos}/${total}`;
-  const pct = total ? (pos / total) * 100 : 0;
-  $("progressBar").style.width = `${pct}%`;
-}
-
-function showCurrent(){
-  if(!activeList.length) return;
-  index = clamp(index, 0, activeList.length - 1);
-  const s = activeList[index];
-  $("english").textContent = s.en || "(empty)";
-  $("chinese").textContent = s.zh ? ("中文： " + s.zh) : "";
-  $("result").textContent = "Recognized text will appear here.";
-  $("score").textContent = "Score will appear here.";
-  $("log").textContent = "";
-  updateFavWrongButtons();
-  updateProgress();
-  saveState();
-}
-
-function updateFavWrongButtons(){
-  if(!activeList.length){ $("btnFav").textContent="⭐ Favorite"; $("btnWrong").textContent="📝 Toggle Wrong"; return; }
-  const s = activeList[index];
-  const id = sentenceId(s);
-  $("btnFav").textContent = favorites.has(id) ? "⭐ Favorited" : "⭐ Favorite";
-  $("btnWrong").textContent = wrongs.has(id) ? "📝 In Wrong-book" : "📝 Toggle Wrong";
-}
-
-/* ======================
-   Lists UI (Favorites / Wrong-book)
-====================== */
-let listTab = "fav"; // fav or wrong
-
-function renderList(){
-  const box = $("listBox");
-  box.innerHTML = "";
-  const ids = listTab === "fav" ? [...favorites] : [...wrongs];
-  $("listTitle").textContent = listTab === "fav" ? "Favorites" : "Wrong-book";
-
-  if(!ids.length){
-    const div = document.createElement("div");
-    div.className = "muted";
-    div.textContent = listTab === "fav" ? "No favorites yet." : "No wrong sentences yet.";
-    box.appendChild(div);
-    return;
-  }
-
-  // Build map id -> sentence text (from fullList)
-  const map = new Map(fullList.map(s => [sentenceId(s), s.en]));
-  ids.forEach((id) => {
-    const en = map.get(id) || id;
-
-    const row = document.createElement("div");
-    row.className = "item";
-
-    const left = document.createElement("div");
-    left.style.flex = "1";
-    left.innerHTML = `<div>${en}</div><div class="tiny">id: <code>${id}</code></div>`;
-
-    const right = document.createElement("div");
-    right.style.display = "flex";
-    right.style.gap = "8px";
-
-    const btnGo = document.createElement("button");
-    btnGo.textContent = "Go";
-    btnGo.onclick = () => {
-      // jump in ALL mode to locate index precisely
-      mode = "all"; $("mode").value = "all";
-      rebuildActiveList();
+$("scene").onchange=e=>loadTopic(e.target.value);
