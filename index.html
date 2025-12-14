@@ -2,254 +2,355 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>English Speaking Practice for You 💕</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speaking Practice</title>
   <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      background: #fafafa;
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+      max-width:860px;margin:28px auto;padding:18px;
+      background:#fafafa;color:#111;
     }
-    h1 {
-      text-align: center;
-      margin-bottom: 10px;
+    .card{
+      background:#fff;border:1px solid #eee;border-radius:14px;
+      padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.04);
+      margin-bottom:14px;
     }
-    .sub {
-      text-align: center;
-      color: #666;
-      font-size: 14px;
-      margin-bottom: 20px;
+    h1{margin:0 0 6px 0;text-align:center;}
+    .sub{margin:0 0 14px 0;text-align:center;color:#666;font-size:14px;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+    select,button,input{
+      border:1px solid #ccc;border-radius:10px;
+      padding:9px 12px;font-size:14px;background:#fff;
     }
-    label {
-      font-size: 14px;
-      margin-right: 8px;
+    button{cursor:pointer}
+    button:hover{background:#f3f3f3}
+    .muted{color:#666;font-size:13px}
+    #english{font-size:20px;font-weight:700;line-height:1.35}
+    #chinese{margin-top:8px;color:#444}
+    .pill{
+      display:inline-block;background:#f1f1f1;border-radius:999px;
+      padding:4px 10px;font-size:12px;color:#444;
     }
-    select {
-      padding: 4px 8px;
+    .progressWrap{width:100%;height:10px;background:#eee;border-radius:999px;overflow:hidden}
+    .progressBar{height:10px;background:#111;width:0%}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:720px){ .grid2{grid-template-columns:1fr} }
+    .list{
+      max-height:220px;overflow:auto;border:1px solid #eee;border-radius:12px;
+      padding:8px;background:#fff;
     }
-    button {
-      margin: 5px;
-      padding: 8px 14px;
-      font-size: 14px;
-      cursor: pointer;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      background: white;
+    .item{
+      padding:8px;border-radius:10px;border:1px solid #eee;margin:6px 0;
+      display:flex;gap:10px;align-items:flex-start;justify-content:space-between;
     }
-    button:hover {
-      background: #f0f0f0;
-    }
-    #target, #result, #score, #hint {
-      margin-top: 15px;
-      padding: 10px;
-      border-radius: 8px;
-      background: #ffffff;
-      box-shadow: 0 0 3px rgba(0,0,0,0.05);
-    }
-    #target strong {
-      font-size: 18px;
-    }
-    #log {
-      margin-top: 10px;
-      color: #666;
-      font-size: 13px;
-    }
-    .tag {
-      display: inline-block;
-      background: #eee;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 12px;
-      margin-left: 4px;
-    }
+    .item button{padding:6px 10px;border-radius:10px}
+    .tiny{font-size:12px;color:#666}
+    .ok{color:#0a7}
+    .warn{color:#b60}
+    .bad{color:#c33}
+    code{background:#f4f4f4;padding:2px 6px;border-radius:6px}
   </style>
 </head>
 <body>
-  <h1>English Speaking Practice 💬</h1>
-  <div class="sub">for my favorite girl 💖</div>
+  <h1>English Speaking Practice</h1>
+  <div class="sub">700 sentences · Prev/Next/Random · Favorites · Wrong-book · Progress saved</div>
 
-  <!-- 场景选择：日常 / 旅游 / 甜甜恋爱 -->
-  <div>
-    <label for="scene">Choose a topic:</label>
-    <select id="scene">
-      <option value="daily">Daily life</option>
-      <option value="travel">Travel</option>
-      <option value="sweet">Sweet</option>
-    </select>
-    <span class="tag">先选一个主题，再点 Next</span>
+  <div class="card">
+    <div class="row" style="justify-content:space-between;">
+      <div class="row">
+        <span class="pill">Topic</span>
+        <select id="scene">
+          <option value="daily">Daily</option>
+          <option value="travel">Travel</option>
+          <option value="sweet">Sweet 💕</option>
+          <option value="shopping">购物 Shopping</option>
+          <option value="housing">住 Housing</option>
+          <option value="dining">吃饭 Dining</option>
+          <option value="study">学习 Study</option>
+        </select>
+
+        <span class="pill">Mode</span>
+        <select id="mode">
+          <option value="all">All sentences</option>
+          <option value="wrong">Wrong-book only</option>
+          <option value="fav">Favorites only</option>
+        </select>
+
+        <span class="pill">Low-score → Wrong-book</span>
+        <input id="threshold" type="number" min="0" max="100" step="1" value="70" style="width:90px" />
+      </div>
+
+      <div class="row">
+        <button id="btnReset">Reset progress</button>
+      </div>
+    </div>
+
+    <div style="margin-top:12px" class="progressWrap" aria-label="progress">
+      <div id="progressBar" class="progressBar"></div>
+    </div>
+    <div style="margin-top:8px" class="row">
+      <div id="progressText" class="muted">Loading…</div>
+      <div id="statusPill" class="pill">Ready</div>
+    </div>
   </div>
 
-  <!-- 显示当前要练的句子 + 中文翻译 -->
-  <div id="target">
-    Click “Next sentence” to start.
+  <div class="card">
+    <div id="english">Loading sentences…</div>
+    <div id="chinese"></div>
+
+    <div class="row" style="margin-top:12px;">
+      <button id="btnPrev">◀ Previous</button>
+      <button id="btnNext">Next ▶</button>
+      <button id="btnRandom">🎲 Random</button>
+      <button id="btnSpeak">🔊 Computer read</button>
+      <button id="btnRecord">🎤 I will speak</button>
+      <button id="btnFav">⭐ Favorite</button>
+      <button id="btnWrong">📝 Toggle Wrong</button>
+    </div>
+
+    <div style="margin-top:10px" class="muted">
+      Tip: Use <b>Chrome</b>. If microphone doesn’t work, check browser permission.
+    </div>
   </div>
 
-  <!-- 按钮区 -->
-  <div style="margin-top: 15px;">
-    <button id="btnNext">Next sentence</button>
-    <button id="btnSpeak">Computer read</button>
-    <button id="btnRecord">I will speak</button>
+  <div class="grid2">
+    <div class="card">
+      <div class="pill">Recognized</div>
+      <div id="result" style="margin-top:10px;">Recognized text will appear here.</div>
+      <div style="margin-top:10px" class="pill">Score</div>
+      <div id="score" style="margin-top:10px;">Score will appear here.</div>
+      <div id="log" class="muted" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div class="pill">Lists</div>
+        <div class="tiny">Click an item to jump</div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button id="tabFav">⭐ Favorites</button>
+        <button id="tabWrong">📝 Wrong-book</button>
+      </div>
+
+      <div id="listTitle" class="muted" style="margin-top:10px;">Favorites</div>
+      <div id="listBox" class="list"></div>
+    </div>
   </div>
 
-  <!-- 识别结果 -->
-  <div id="result">Recognized text will appear here.</div>
-  <!-- 分数 + 鼓励 -->
-  <div id="score">Score will appear here.</div>
-  <!-- 小提示 -->
-  <div id="hint">Tip: Use Google Chrome, and allow microphone when the browser asks.</div>
-  <!-- 日志状态 -->
-  <div id="log"></div>
+<script>
+/* ======================
+   Storage keys (per topic)
+====================== */
+function k(topic, name){ return `spk_${topic}_${name}`; }
 
-  <script>
-    // ===== 1. 句子库：可以改成你们自己的句子 =====
-    // 每个句子：english 英文, chinese 中文翻译
-    const data = {
-      daily: [
-        { english: "How are you today?", chinese: "你今天怎么样？" },
-        { english: "I just finished my work.", chinese: "我刚刚下班/完成工作。" },
-        { english: "I am learning English every day.", chinese: "我每天都在学英语。" },
-        { english: "This is not perfect, but I am getting better.", chinese: "虽然不完美，但我在慢慢进步。" }
-      ],
-      travel: [
-        { english: "Where is the nearest subway station?", chinese: "最近的地铁站在哪里？" },
-        { english: "Could you recommend a good restaurant nearby?", chinese: "你可以推荐附近好吃的餐厅吗？" },
-        { english: "How much is a ticket to the airport?", chinese: "去机场的车票多少钱？" },
-        { english: "I would like to book a table for two.", chinese: "我想订一张两个人的餐桌。" }
-      ],
-      sweet: [
-        { english: "I am proud of you.", chinese: "我真的为你感到骄傲。" },
-        { english: "I miss you every single day.", chinese: "我每天都在想你。" },
-        { english: "You make my life so much better.", chinese: "因为你，我的生活变得好多了。" },
-        { english: "No matter what happens, I am always on your side.", chinese: "不管发生什么，我都站在你这边。" }
-      ]
-    };
+/* ======================
+   State
+====================== */
+let topic = "daily";
+let mode = "all";              // all / wrong / fav
+let threshold = 70;
 
-    // 当前场景的句子列表
-    let currentList = data.daily;
-    // 当前这一次要练的句子
-    let currentSentence = null;
+let fullList = [];             // loaded from data/topic.json
+let activeList = [];           // filtered by mode
+let index = -1;                // current index in activeList
 
-    // ===== 2. 获取页面上的元素 =====
-    const sceneSelect = document.getElementById("scene");
-    const targetDiv = document.getElementById("target");
-    const resultDiv = document.getElementById("result");
-    const scoreDiv = document.getElementById("score");
-    const hintDiv = document.getElementById("hint");
-    const logDiv = document.getElementById("log");
+let favorites = new Set();     // store ids
+let wrongs = new Set();        // store ids
+let lastScores = new Map();    // id -> last score
 
-    // ===== 3. 场景改变时，切换句子列表 =====
-    sceneSelect.onchange = function () {
-      const value = sceneSelect.value;
-      if (value === "daily") currentList = data.daily;
-      else if (value === "travel") currentList = data.travel;
-      else if (value === "sweet") currentList = data.sweet;
+/* ======================
+   Helpers
+====================== */
+const $ = (id)=>document.getElementById(id);
 
-      // 切换场景后，清空当前显示
-      currentSentence = null;
-      targetDiv.innerHTML = "Click “Next sentence” to start.";
-      resultDiv.textContent = "Recognized text will appear here.";
-      scoreDiv.textContent = "Score will appear here.";
-      logDiv.textContent = "";
-    };
+function sentenceId(s){
+  // stable-ish id: use first 80 chars of en
+  return (s.en || "").trim().toLowerCase().slice(0,80);
+}
 
-    // ===== 4. 简单相似度计算：按单词重合数量算百分比 =====
-    function calcSimilarity(a, b) {
-      if (!a || !b) return 0;
+function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
 
-      // 全部转小写，去掉标点，只保留字母和空格，再按空格拆成单词
-      const wa = a.toLowerCase().replace(/[^a-z\s]/g, "").split(/\s+/).filter(Boolean);
-      const wb = b.toLowerCase().replace(/[^a-z\s]/g, "").split(/\s+/).filter(Boolean);
+function setStatus(text){
+  $("statusPill").textContent = text;
+}
 
-      if (wa.length === 0 || wb.length === 0) return 0;
+function saveState(){
+  localStorage.setItem(k(topic,"index"), String(index));
+  localStorage.setItem(k(topic,"favorites"), JSON.stringify([...favorites]));
+  localStorage.setItem(k(topic,"wrongs"), JSON.stringify([...wrongs]));
+  localStorage.setItem(k(topic,"threshold"), String(threshold));
+  localStorage.setItem(k(topic,"mode"), mode);
+}
 
-      let match = 0;
-      wa.forEach(word => {
-        if (wb.includes(word)) match++;
-      });
+function loadState(){
+  try{
+    const idx = parseInt(localStorage.getItem(k(topic,"index")) ?? "-1", 10);
+    index = Number.isFinite(idx) ? idx : -1;
 
-      return Math.round((match / Math.max(wa.length, wb.length)) * 100);
-    }
+    favorites = new Set(JSON.parse(localStorage.getItem(k(topic,"favorites")) ?? "[]"));
+    wrongs = new Set(JSON.parse(localStorage.getItem(k(topic,"wrongs")) ?? "[]"));
 
-    // ===== 5. “Next sentence” 按钮：随机挑一句当前场景的句子 =====
-    document.getElementById("btnNext").onclick = function () {
-      const idx = Math.floor(Math.random() * currentList.length);
-      currentSentence = currentList[idx];
+    threshold = parseInt(localStorage.getItem(k(topic,"threshold")) ?? "70", 10);
+    threshold = clamp(threshold, 0, 100);
+    $("threshold").value = threshold;
 
-      targetDiv.innerHTML =
-        "<div>English:</div>" +
-        "<strong>" + currentSentence.english + "</strong>" +
-        "<div style='margin-top:8px;color:#555;'>中文： " + currentSentence.chinese + "</div>";
+    mode = localStorage.getItem(k(topic,"mode")) ?? "all";
+    $("mode").value = mode;
+  }catch{
+    index = -1; favorites = new Set(); wrongs = new Set(); threshold = 70; mode = "all";
+  }
+}
 
-      resultDiv.textContent = "Recognized text will appear here.";
-      scoreDiv.textContent = "Score will appear here.";
-      logDiv.textContent = "";
-    };
+function cleanWords(s){
+  return (s || "").toLowerCase().replace(/[^a-z\s]/g,"").split(/\s+/).filter(Boolean);
+}
 
-    // ===== 6. “Computer read” 按钮：用浏览器 TTS 读一句 =====
-    document.getElementById("btnSpeak").onclick = function () {
-      if (!currentSentence) {
-        logDiv.textContent = "Please click 'Next sentence' first.";
-        return;
-      }
-      const utter = new SpeechSynthesisUtterance(currentSentence.english);
-      utter.lang = "en-US"; // 可以固定为美音
-      window.speechSynthesis.speak(utter);
-    };
+/* ======================
+   Strict-ish text matching score
+   (still not phoneme-level; but much stricter than word-set)
+====================== */
+function calcSimilarity(spoken, target){
+  if(!spoken || !target) return 0;
+  const sWords = cleanWords(spoken);
+  const tWords = cleanWords(target);
+  if(!sWords.length || !tWords.length) return 0;
 
-    // ===== 7. “I will speak” 按钮：开始录音 + 语音识别 =====
-    document.getElementById("btnRecord").onclick = function () {
-      // 检查浏览器是否支持语音识别
-      if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
-        logDiv.textContent = "Speech recognition not supported. Please use Google Chrome.";
-        return;
-      }
+  let score = 0;
+  const maxScore = tWords.length * 2;
 
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognition = new SR();
-      recognition.lang = "en-US";
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+  // order-sensitive matching
+  let ti = 0;
+  for(const w of sWords){
+    if(ti < tWords.length && w === tWords[ti]){ score += 2; ti++; }
+    else if(tWords.includes(w)) score += 1;
+  }
 
-      logDiv.textContent = "Listening... Please speak.";
-      hintDiv.textContent = "If nothing happens, check if you allowed microphone access.";
+  // length penalty (speaking too short)
+  const ratio = sWords.length / tWords.length;
+  if(ratio < 0.75) score *= ratio;
 
-      // 识别成功
-      recognition.onresult = (event) => {
-        const text = event.results[0][0].transcript;
-        resultDiv.textContent = "You said: " + text;
+  return Math.round(Math.min(100, (score / maxScore) * 100));
+}
 
-        if (currentSentence) {
-          const score = calcSimilarity(text, currentSentence.english);
-          scoreDiv.textContent = "Similarity: " + score + "%";
+/* ======================
+   Load sentences from JSON
+====================== */
+async function loadTopic(t){
+  topic = t;
+  setStatus("Loading…");
+  $("english").textContent = "Loading sentences…";
+  $("chinese").textContent = "";
+  $("result").textContent = "Recognized text will appear here.";
+  $("score").textContent = "Score will appear here.";
+  $("log").textContent = "";
 
-          if (score > 85) {
-            scoreDiv.textContent += "  🌟 Amazing!";
-          } else if (score > 60) {
-            scoreDiv.textContent += "  🙂 Pretty good, try again!";
-          } else {
-            scoreDiv.textContent += "  💪 Keep going, you are learning!";
-          }
-        }
-        logDiv.textContent = "Done.";
-      };
+  const resp = await fetch(`data/${topic}.json`, { cache:"no-cache" });
+  if(!resp.ok) throw new Error(`Failed to load data/${topic}.json`);
+  fullList = await resp.json();
 
-      // 出错情况
-      recognition.onerror = (event) => {
-        logDiv.textContent = "Error: " + event.error;
-      };
+  // normalize entries
+  fullList = fullList.map(s => ({ en: (s.en||"").trim(), zh: (s.zh||"").trim() }));
 
-      // 结束（无论成功失败）
-      recognition.onend = () => {
-        if (!logDiv.textContent.startsWith("Error") && logDiv.textContent !== "Done.") {
-          logDiv.textContent = "Stopped. You can click 'I will speak' again.";
-        }
-      };
+  loadState();
+  rebuildActiveList();
+  // if saved index is out of range, reset
+  if(index < -1 || index >= activeList.length) index = -1;
 
-      recognition.start();
-    };
-  </script>
-</body>
-</html>
+  // show a sentence (resume if possible)
+  if(activeList.length){
+    if(index === -1) index = 0;
+    showCurrent();
+  }else{
+    $("english").textContent = "No sentences in this mode yet.";
+    $("chinese").textContent = "Try switching Mode back to All sentences.";
+    updateProgress();
+  }
+
+  renderList();
+  setStatus("Ready");
+}
+
+function rebuildActiveList(){
+  if(mode === "all"){
+    activeList = fullList;
+  }else if(mode === "fav"){
+    activeList = fullList.filter(s => favorites.has(sentenceId(s)));
+  }else if(mode === "wrong"){
+    activeList = fullList.filter(s => wrongs.has(sentenceId(s)));
+  }else{
+    activeList = fullList;
+  }
+}
+
+function updateProgress(){
+  const total = activeList.length || 0;
+  const pos = total ? (index + 1) : 0;
+  $("progressText").textContent = `Topic: ${topic} · Mode: ${mode} · ${pos}/${total}`;
+  const pct = total ? (pos / total) * 100 : 0;
+  $("progressBar").style.width = `${pct}%`;
+}
+
+function showCurrent(){
+  if(!activeList.length) return;
+  index = clamp(index, 0, activeList.length - 1);
+  const s = activeList[index];
+  $("english").textContent = s.en || "(empty)";
+  $("chinese").textContent = s.zh ? ("中文： " + s.zh) : "";
+  $("result").textContent = "Recognized text will appear here.";
+  $("score").textContent = "Score will appear here.";
+  $("log").textContent = "";
+  updateFavWrongButtons();
+  updateProgress();
+  saveState();
+}
+
+function updateFavWrongButtons(){
+  if(!activeList.length){ $("btnFav").textContent="⭐ Favorite"; $("btnWrong").textContent="📝 Toggle Wrong"; return; }
+  const s = activeList[index];
+  const id = sentenceId(s);
+  $("btnFav").textContent = favorites.has(id) ? "⭐ Favorited" : "⭐ Favorite";
+  $("btnWrong").textContent = wrongs.has(id) ? "📝 In Wrong-book" : "📝 Toggle Wrong";
+}
+
+/* ======================
+   Lists UI (Favorites / Wrong-book)
+====================== */
+let listTab = "fav"; // fav or wrong
+
+function renderList(){
+  const box = $("listBox");
+  box.innerHTML = "";
+  const ids = listTab === "fav" ? [...favorites] : [...wrongs];
+  $("listTitle").textContent = listTab === "fav" ? "Favorites" : "Wrong-book";
+
+  if(!ids.length){
+    const div = document.createElement("div");
+    div.className = "muted";
+    div.textContent = listTab === "fav" ? "No favorites yet." : "No wrong sentences yet.";
+    box.appendChild(div);
+    return;
+  }
+
+  // Build map id -> sentence text (from fullList)
+  const map = new Map(fullList.map(s => [sentenceId(s), s.en]));
+  ids.forEach((id) => {
+    const en = map.get(id) || id;
+
+    const row = document.createElement("div");
+    row.className = "item";
+
+    const left = document.createElement("div");
+    left.style.flex = "1";
+    left.innerHTML = `<div>${en}</div><div class="tiny">id: <code>${id}</code></div>`;
+
+    const right = document.createElement("div");
+    right.style.display = "flex";
+    right.style.gap = "8px";
+
+    const btnGo = document.createElement("button");
+    btnGo.textContent = "Go";
+    btnGo.onclick = () => {
+      // jump in ALL mode to locate index precisely
+      mode = "all"; $("mode").value = "all";
+      rebuildActiveList();
