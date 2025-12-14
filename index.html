@@ -245,7 +245,7 @@ async function loadTopic(t){
   $("score").textContent = "Score will appear here.";
   $("log").textContent = "";
 
-  const resp = await fetch(`data/${topic}.json`, { cache:"no-cache" });
+  const resp = await fetch(`./data/${topic}.json`, { cache: "no-cache" });
   if(!resp.ok) throw new Error(`Failed to load data/${topic}.json`);
   fullList = await resp.json();
 
