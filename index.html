@@ -1,136 +1,396 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>English Speaking Practice</title>
-<style>
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-  max-width:900px;margin:30px auto;padding:20px;background:#fafafa;color:#111;
-}
-.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;
-box-shadow:0 2px 10px rgba(0,0,0,.05)}
-h1{text-align:center;margin-bottom:6px}
-.sub{text-align:center;color:#666;margin-bottom:14px}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-button,select,input{
-  padding:8px 12px;border-radius:10px;border:1px solid #ccc;background:#fff;cursor:pointer
-}
-button:hover{background:#f3f3f3}
-#english{font-size:20px;font-weight:700;line-height:1.4}
-#chinese{margin-top:6px;color:#444}
-.progress{height:10px;background:#eee;border-radius:999px;overflow:hidden}
-.bar{height:10px;background:#111;width:0%}
-.list{max-height:200px;overflow:auto;border:1px solid #eee;border-radius:10px;padding:8px}
-.item{border:1px solid #eee;border-radius:8px;padding:8px;margin:6px 0;
-display:flex;justify-content:space-between;gap:10px}
-.small{font-size:12px;color:#666}
-.good{color:#0a7}
-.warn{color:#b60}
-.bad{color:#c33}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>口语练习</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;max-width:900px;margin:28px auto;padding:18px;background:#fafafa;color:#111}
+    .card{background:#fff;border:1px solid #eee;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.04);margin-bottom:14px}
+    h1{margin:0 0 6px 0;text-align:center}
+    .sub{margin:0 0 14px 0;text-align:center;color:#666;font-size:14px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    select,button,input{border:1px solid #ccc;border-radius:10px;padding:9px 12px;font-size:14px;background:#fff}
+    button{cursor:pointer}
+    button:hover{background:#f3f3f3}
+    .muted{color:#666;font-size:13px}
+    #english{font-size:20px;font-weight:700;line-height:1.35}
+    #chinese{margin-top:8px;color:#444}
+    .pill{display:inline-block;background:#f1f1f1;border-radius:999px;padding:4px 10px;font-size:12px;color:#444}
+    .progressWrap{width:100%;height:10px;background:#eee;border-radius:999px;overflow:hidden}
+    .progressBar{height:10px;background:#111;width:0%}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:720px){ .grid2{grid-template-columns:1fr} }
+    .list{max-height:220px;overflow:auto;border:1px solid #eee;border-radius:12px;padding:8px;background:#fff}
+    .item{padding:8px;border-radius:10px;border:1px solid #eee;margin:6px 0;display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+    .item button{padding:6px 10px;border-radius:10px}
+    .tiny{font-size:12px;color:#666}
+    .ok{color:#0a7}.warn{color:#b60}.bad{color:#c33}
+    code{background:#f4f4f4;padding:2px 6px;border-radius:6px}
+  </style>
 </head>
 <body>
+  <h1>English Speaking Practice</h1>
+  <div class="sub">上一句 / 下一句 / 随机 · 进度条 · 收藏 · 错题本（自动）</div>
 
-<h1>English Speaking Practice</h1>
-<div class="sub">700 TOEFL-level sentences · Progress saved</div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between;">
+      <div class="row">
+        <span class="pill">Topic</span>
+        <select id="scene">
+          <option value="daily">Daily</option>
+          <option value="travel">Travel</option>
+          <option value="sweet">Sweet</option>
+          <option value="shopping">购物 Shopping</option>
+          <option value="housing">住 Housing</option>
+          <option value="dining">吃饭 Dining</option>
+          <option value="study">学习 Study</option>
+        </select>
 
-<div class="card">
-  <div class="row">
-    <select id="scene">
-      <option value="daily">Daily</option>
-      <option value="travel">Travel</option>
-      <option value="sweet">Sweet</option>
-      <option value="shopping">Shopping</option>
-      <option value="housing">Housing</option>
-      <option value="dining">Dining</option>
-      <option value="study">Study</option>
-    </select>
+        <span class="pill">Mode</span>
+        <select id="mode">
+          <option value="all">All</option>
+          <option value="wrong">Wrong-book</option>
+          <option value="fav">Favorites</option>
+        </select>
 
-    <select id="mode">
-      <option value="all">All</option>
-      <option value="fav">Favorites</option>
-      <option value="wrong">Wrong-book</option>
-    </select>
+        <span class="pill">低于该分进错题</span>
+        <input id="threshold" type="number" min="0" max="100" step="1" value="70" style="width:90px" />
+      </div>
 
-    <span class="small">Wrong if &lt;</span>
-    <input id="threshold" type="number" value="70" style="width:60px"/>
+      <div class="row">
+        <button id="btnReset">Reset progress</button>
+      </div>
+    </div>
+
+    <div style="margin-top:12px" class="progressWrap">
+      <div id="progressBar" class="progressBar"></div>
+    </div>
+    <div style="margin-top:8px" class="row">
+      <div id="progressText" class="muted">Loading…</div>
+      <div id="statusPill" class="pill">Ready</div>
+    </div>
   </div>
 
-  <div style="margin-top:10px" class="progress">
-    <div id="bar" class="bar"></div>
+  <div class="card">
+    <div id="english">Loading…</div>
+    <div id="chinese"></div>
+
+    <div class="row" style="margin-top:12px;">
+      <button id="btnPrev">◀ Previous</button>
+      <button id="btnNext">Next ▶</button>
+      <button id="btnRandom">🎲 Random</button>
+      <button id="btnSpeak">🔊 Read</button>
+      <button id="btnRecord">🎤 Speak</button>
+      <button id="btnFav">⭐ Favorite</button>
+      <button id="btnWrong">📝 Toggle Wrong</button>
+    </div>
+
+    <div style="margin-top:10px" class="muted">
+      建议用 Chrome；麦克风没反应就检查网站权限。
+    </div>
   </div>
-  <div id="progressText" class="small"></div>
-</div>
 
-<div class="card">
-  <div id="english">Loading…</div>
-  <div id="chinese"></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="pill">Recognized</div>
+      <div id="result" style="margin-top:10px;">Recognized text will appear here.</div>
+      <div style="margin-top:10px" class="pill">Score</div>
+      <div id="score" style="margin-top:10px;">Score will appear here.</div>
+      <div id="log" class="muted" style="margin-top:10px;"></div>
+    </div>
 
-  <div class="row" style="margin-top:12px">
-    <button id="prev">◀ Prev</button>
-    <button id="next">Next ▶</button>
-    <button id="rand">🎲 Random</button>
-    <button id="speak">🔊 Read</button>
-    <button id="record">🎤 Speak</button>
-    <button id="fav">⭐</button>
-    <button id="wrong">📝</button>
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div class="pill">Lists</div>
+        <div class="tiny">点击 Go 可跳转</div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button id="tabFav">⭐ Favorites</button>
+        <button id="tabWrong">📝 Wrong-book</button>
+      </div>
+
+      <div id="listTitle" class="muted" style="margin-top:10px;">Favorites</div>
+      <div id="listBox" class="list"></div>
+    </div>
   </div>
-
-  <div id="result" class="small"></div>
-  <div id="score"></div>
-</div>
-
-<div class="card">
-  <div class="row">
-    <button id="tabFav">⭐ Favorites</button>
-    <button id="tabWrong">📝 Wrong-book</button>
-  </div>
-  <div id="list" class="list"></div>
-</div>
 
 <script>
-const $ = id => document.getElementById(id);
-let topic="daily",mode="all",threshold=70;
-let full=[],active=[],idx=0;
-let fav=new Set(),wrong=new Set();
+function k(topic, name){ return `spk_${topic}_${name}`; }
+const $ = (id)=>document.getElementById(id);
 
-function sid(s){return s.en.slice(0,80).toLowerCase()}
-function save(){
-  localStorage.setItem(topic+"_i",idx);
-  localStorage.setItem(topic+"_f",[...fav]);
-  localStorage.setItem(topic+"_w",[...wrong]);
+let topic = "daily";
+let mode = "all";
+let threshold = 70;
+
+let fullList = [];
+let activeList = [];
+let index = -1;
+
+let favorites = new Set();
+let wrongs = new Set();
+
+let listTab = "fav";
+
+function sentenceId(s){ return (s.en || "").trim().toLowerCase().slice(0,80); }
+function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+function setStatus(text){ $("statusPill").textContent = text; }
+
+function saveState(){
+  localStorage.setItem(k(topic,"index"), String(index));
+  localStorage.setItem(k(topic,"favorites"), JSON.stringify([...favorites]));
+  localStorage.setItem(k(topic,"wrongs"), JSON.stringify([...wrongs]));
+  localStorage.setItem(k(topic,"threshold"), String(threshold));
+  localStorage.setItem(k(topic,"mode"), mode);
 }
-function load(){
-  idx=parseInt(localStorage.getItem(topic+"_i")||0);
-  fav=new Set((localStorage.getItem(topic+"_f")||"").split(",").filter(x=>x));
-  wrong=new Set((localStorage.getItem(topic+"_w")||"").split(",").filter(x=>x));
-}
-function rebuild(){
-  if(mode==="fav") active=full.filter(s=>fav.has(sid(s)));
-  else if(mode==="wrong") active=full.filter(s=>wrong.has(sid(s)));
-  else active=full;
-  if(idx>=active.length) idx=0;
-}
-function show(){
-  if(!active.length){$("english").textContent="No sentences";return}
-  const s=active[idx];
-  $("english").textContent=s.en;
-  $("chinese").textContent=s.zh||"";
-  $("progressText").textContent=`${idx+1}/${active.length}`;
-  $("bar").style.width=((idx+1)/active.length*100)+"%";
-  save(); renderList();
-}
-async function loadTopic(t){
-  topic=t;
-  $("english").textContent="Loading…";
-  const resp=await fetch(`./data/${topic}.json`,{cache:"no-cache"});
-  if(!resp.ok){
-    const msg=`Fetch failed ${resp.status} ${resp.statusText}`;
-    $("english").textContent=msg; throw new Error(msg);
+
+function loadState(){
+  try{
+    const idx = parseInt(localStorage.getItem(k(topic,"index")) ?? "-1", 10);
+    index = Number.isFinite(idx) ? idx : -1;
+
+    favorites = new Set(JSON.parse(localStorage.getItem(k(topic,"favorites")) ?? "[]"));
+    wrongs = new Set(JSON.parse(localStorage.getItem(k(topic,"wrongs")) ?? "[]"));
+
+    threshold = parseInt(localStorage.getItem(k(topic,"threshold")) ?? "70", 10);
+    threshold = clamp(threshold, 0, 100);
+    $("threshold").value = threshold;
+
+    mode = localStorage.getItem(k(topic,"mode")) ?? "all";
+    $("mode").value = mode;
+  }catch{
+    index = -1; favorites = new Set(); wrongs = new Set(); threshold = 70; mode = "all";
   }
-  full=await resp.json(); load(); rebuild(); show();
 }
 
-$("scene").onchange=e=>loadTopic(e.target.value);
+function rebuildActiveList(){
+  if(mode === "all") activeList = fullList;
+  else if(mode === "fav") activeList = fullList.filter(s => favorites.has(sentenceId(s)));
+  else if(mode === "wrong") activeList = fullList.filter(s => wrongs.has(sentenceId(s)));
+  else activeList = fullList;
+}
+
+function updateProgress(){
+  const total = activeList.length || 0;
+  const pos = total ? (index + 1) : 0;
+  $("progressText").textContent = `Topic: ${topic} · Mode: ${mode} · ${pos}/${total}`;
+  $("progressBar").style.width = (total ? (pos/total*100) : 0) + "%";
+}
+
+function updateFavWrongButtons(){
+  if(!activeList.length) return;
+  const id = sentenceId(activeList[index]);
+  $("btnFav").textContent = favorites.has(id) ? "⭐ Favorited" : "⭐ Favorite";
+  $("btnWrong").textContent = wrongs.has(id) ? "📝 In Wrong-book" : "📝 Toggle Wrong";
+}
+
+function showCurrent(){
+  if(!activeList.length){
+    $("english").textContent = "No sentences in this mode.";
+    $("chinese").textContent = "切换 Mode 回 All 试试。";
+    updateProgress();
+    return;
+  }
+  index = clamp(index, 0, activeList.length - 1);
+  const s = activeList[index];
+  $("english").textContent = s.en || "(empty)";
+  $("chinese").textContent = s.zh ? ("中文： " + s.zh) : "";
+  $("result").textContent = "Recognized text will appear here.";
+  $("score").textContent = "Score will appear here.";
+  $("log").textContent = "";
+  updateFavWrongButtons();
+  updateProgress();
+  saveState();
+}
+
+function cleanWords(s){
+  return (s || "").toLowerCase().replace(/[^a-z\s]/g,"").split(/\s+/).filter(Boolean);
+}
+function calcSimilarity(spoken, target){
+  if(!spoken || !target) return 0;
+  const sWords = cleanWords(spoken);
+  const tWords = cleanWords(target);
+  if(!sWords.length || !tWords.length) return 0;
+
+  let score = 0;
+  const maxScore = tWords.length * 2;
+  let ti = 0;
+  for(const w of sWords){
+    if(ti < tWords.length && w === tWords[ti]){ score += 2; ti++; }
+    else if(tWords.includes(w)) score += 1;
+  }
+  const ratio = sWords.length / tWords.length;
+  if(ratio < 0.75) score *= ratio;
+  return Math.round(Math.min(100, (score / maxScore) * 100));
+}
+
+function renderList(){
+  const box = $("listBox");
+  box.innerHTML = "";
+  const ids = listTab === "fav" ? [...favorites] : [...wrongs];
+  $("listTitle").textContent = listTab === "fav" ? "Favorites" : "Wrong-book";
+
+  if(!ids.length){
+    const div = document.createElement("div");
+    div.className = "muted";
+    div.textContent = listTab === "fav" ? "No favorites yet." : "No wrong sentences yet.";
+    box.appendChild(div);
+    return;
+  }
+
+  const map = new Map(fullList.map(s => [sentenceId(s), s.en]));
+  ids.forEach((id) => {
+    const en = map.get(id) || id;
+
+    const row = document.createElement("div");
+    row.className = "item";
+
+    const left = document.createElement("div");
+    left.style.flex = "1";
+    left.innerHTML = `<div>${en}</div><div class="tiny">id: <code>${id}</code></div>`;
+
+    const right = document.createElement("div");
+    right.style.display = "flex";
+    right.style.gap = "8px";
+
+    const btnGo = document.createElement("button");
+    btnGo.textContent = "Go";
+    btnGo.onclick = () => {
+      mode = "all"; $("mode").value = "all";
+      rebuildActiveList();
+      const idx = fullList.findIndex(s => sentenceId(s) === id);
+      index = idx >= 0 ? idx : 0;
+      showCurrent();
+      renderList();
+    };
+
+    const btnRm = document.createElement("button");
+    btnRm.textContent = "Remove";
+    btnRm.onclick = () => {
+      if(listTab === "fav") favorites.delete(id);
+      else wrongs.delete(id);
+      saveState();
+      rebuildActiveList();
+      if(index >= activeList.length) index = activeList.length - 1;
+      renderList();
+      updateFavWrongButtons();
+      updateProgress();
+    };
+
+    right.appendChild(btnGo);
+    right.appendChild(btnRm);
+    row.appendChild(left);
+    row.appendChild(right);
+    box.appendChild(row);
+  });
+}
+
+async function loadTopic(t){
+  topic = t;
+  setStatus("Loading…");
+  $("english").textContent = "Loading…";
+  $("log").textContent = "";
+
+  // 关键：用 ./data 并且失败就显示原因
+  const resp = await fetch(`./data/${topic}.json`, { cache:"no-cache" });
+  if (!resp.ok) {
+    const msg = `Fetch failed: ${resp.status} ${resp.statusText} (./data/${topic}.json)`;
+    $("english").textContent = msg;
+    $("log").textContent = msg;
+    setStatus("Error");
+    throw new Error(msg);
+  }
+
+  const json = await resp.json();
+  fullList = (json || []).map(s => ({ en: (s.en||"").trim(), zh: (s.zh||"").trim() }));
+
+  loadState();
+  rebuildActiveList();
+
+  if(activeList.length){
+    if(index === -1) index = 0;
+    showCurrent();
+  }else{
+    $("english").textContent = "No sentences in this mode yet.";
+    $("chinese").textContent = "Try switching Mode back to All.";
+    updateProgress();
+  }
+
+  renderList();
+  setStatus("Ready");
+}
+
+$("scene").onchange = () => loadTopic($("scene").value).catch(()=>{});
+$("mode").onchange = () => { mode = $("mode").value; rebuildActiveList(); if(index>=activeList.length) index = 0; showCurrent(); renderList(); saveState(); };
+$("threshold").onchange = () => { threshold = clamp(parseInt($("threshold").value||"70",10),0,100); $("threshold").value = threshold; saveState(); };
+$("btnReset").onclick = () => { if(confirm("Reset progress for this topic?")) { index = 0; saveState(); showCurrent(); } };
+
+$("btnPrev").onclick = () => { if(!activeList.length) return; index = clamp(index-1,0,activeList.length-1); showCurrent(); };
+$("btnNext").onclick = () => { if(!activeList.length) return; index = clamp(index+1,0,activeList.length-1); showCurrent(); };
+$("btnRandom").onclick = () => { if(!activeList.length) return; index = Math.floor(Math.random()*activeList.length); showCurrent(); };
+
+$("btnSpeak").onclick = () => {
+  if(!activeList.length) return;
+  const u = new SpeechSynthesisUtterance(activeList[index].en);
+  u.lang = "en-US";
+  speechSynthesis.speak(u);
+};
+
+$("btnFav").onclick = () => {
+  if(!activeList.length) return;
+  const id = sentenceId(activeList[index]);
+  favorites.has(id) ? favorites.delete(id) : favorites.add(id);
+  saveState(); rebuildActiveList(); updateFavWrongButtons(); renderList();
+};
+
+$("btnWrong").onclick = () => {
+  if(!activeList.length) return;
+  const id = sentenceId(activeList[index]);
+  wrongs.has(id) ? wrongs.delete(id) : wrongs.add(id);
+  saveState(); rebuildActiveList(); updateFavWrongButtons(); renderList();
+};
+
+$("tabFav").onclick = () => { listTab="fav"; renderList(); };
+$("tabWrong").onclick = () => { listTab="wrong"; renderList(); };
+
+$("btnRecord").onclick = () => {
+  if(!activeList.length) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ $("log").textContent = "SpeechRecognition not supported. Please use Chrome."; return; }
+  const rec = new SR();
+  rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 1;
+  setStatus("Listening…");
+  $("log").textContent = "Listening…";
+  rec.start();
+
+  rec.onresult = (e) => {
+    const spoken = e.results[0][0].transcript;
+    const target = activeList[index].en;
+    $("result").textContent = "You said: " + spoken;
+
+    const sc = calcSimilarity(spoken, target);
+    let cls="warn", msg="🙂 Keep refining";
+    if(sc>=90){cls="ok";msg="🌟 Excellent";}
+    else if(sc>=75){cls="ok";msg="👍 Very good";}
+    else if(sc<60){cls="bad";msg="💪 Practice more";}
+    $("score").innerHTML = `Similarity: <b class="${cls}">${sc}%</b> — ${msg}`;
+
+    const id = sentenceId(activeList[index]);
+    if(sc < threshold){ wrongs.add(id); $("log").textContent = `Added to Wrong-book (score < ${threshold}).`; }
+    else { $("log").textContent = "Nice! Not added to Wrong-book."; }
+
+    saveState(); updateFavWrongButtons(); renderList(); setStatus("Ready");
+  };
+
+  rec.onerror = (e) => { $("log").textContent = "Error: " + e.error; setStatus("Error"); };
+  rec.onend = () => { setStatus("Ready"); };
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  $("scene").value = "daily";
+  loadTopic("daily").catch(()=>{});
+});
+</script>
+</body>
+</html>
