@@ -37,20 +37,24 @@
   const input = (prompt("Enter password:") || "").trim();
 
   if (input !== PASSWORD) {
-    document.body.style.display = "block";
-    document.body.innerHTML = `
-      <div style="text-align:center;margin-top:80px;font-family:sans-serif">
-        <h2>Access denied</h2>
-      </div>`;
     window.__AUTH_OK__ = false;
-    return;
+    document.open();
+    document.write(`
+      <!DOCTYPE html><html><head><meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>Access denied</title></head>
+      <body style="font-family:sans-serif;text-align:center;margin-top:80px">
+        <h2>Access denied</h2>
+      </body></html>
+    `);
+    document.close();
+    throw new Error("Unauthorized");
   }
 
   window.__AUTH_OK__ = true;
   document.body.style.display = "block";
 })();
 </script>
-
 
   <h1>English Speaking Practice</h1>
   <div class="sub">上一句 / 下一句 / 随机 · 进度条 · 收藏 · 错题本（自动）</div>
