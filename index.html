@@ -33,16 +33,23 @@
 <script>
 (function () {
   const PASSWORD = "lucia";
-  const input = (prompt("Enter password:") || "").trim().toLowerCase();
+  const input = (prompt("Enter password:") || "").trim();
 
   if (input !== PASSWORD) {
-    document.open();
-    document.write("<h2 style='text-align:center;margin-top:60px;font-family:sans-serif'>Access denied</h2>");
-    document.close();
-    throw new Error("Wrong password");
+    document.body.style.display = "block";
+    document.body.innerHTML = `
+      <div style="text-align:center;margin-top:80px;font-family:sans-serif">
+        <h2>Access denied</h2>
+      </div>`;
+    window.__AUTH_OK__ = false;
+    return;
   }
+
+  window.__AUTH_OK__ = true;
+  document.body.style.display = "block";
 })();
 </script>
+
 
   <h1>English Speaking Practice</h1>
   <div class="sub">上一句 / 下一句 / 随机 · 进度条 · 收藏 · 错题本（自动）</div>
