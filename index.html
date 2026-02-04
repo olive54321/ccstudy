@@ -138,6 +138,10 @@
   </div>
 
 <script>
+  if (window.__AUTH_OK__ !== true) {
+  throw new Error("Unauthorized");
+}
+
 function k(topic, name){ return `spk_${topic}_${name}`; }
 const $ = (id)=>document.getElementById(id);
 
