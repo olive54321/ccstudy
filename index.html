@@ -36,9 +36,6 @@
   const PASSWORD = "lucia";
   const input = (prompt("Enter password:") || "").trim();
 
-  // 先让 body 可见（这样 denied 能显示）
-  document.body.style.display = "block";
-
   if (input !== PASSWORD) {
     window.__AUTH_OK__ = false;
     document.body.innerHTML = `
@@ -49,7 +46,12 @@
   }
 
   window.__AUTH_OK__ = true;
-  // 通过才显示真正页面
+
+  // ✅ 等 #app 出现后再显示
+  window.addEventListener("DOMContentLoaded", () => {
+    const app = document.getElementById("app");
+    if (app) app.style.display = "block";
+  });
 })();
 </script>
 <div id="app">
