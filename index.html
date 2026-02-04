@@ -30,6 +30,25 @@
   </style>
 </head>
 <body>
+  <script>
+(function () {
+  const PASSWORD = "lucia";        // 👈 你的密码
+  const KEY = "ccstudy_auth_ok";   // 本地记忆 key
+
+  if (localStorage.getItem(KEY) !== "yes") {
+    const input = prompt("Enter password:");
+    if (input !== PASSWORD) {
+      document.body.innerHTML = `
+        <div style="text-align:center;margin-top:60px;font-family:sans-serif">
+          <h2>Access denied</h2>
+        </div>`;
+      throw new Error("Wrong password");
+    }
+    localStorage.setItem(KEY, "yes");
+  }
+})();
+</script>
+
   <h1>English Speaking Practice</h1>
   <div class="sub">上一句 / 下一句 / 随机 · 进度条 · 收藏 · 错题本（自动）</div>
 
